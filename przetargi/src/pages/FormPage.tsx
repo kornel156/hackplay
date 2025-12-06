@@ -159,8 +159,6 @@ const FormPage = () => {
     }
   };
 
-  const hasAnyData = Object.values(formData).some(value => value.trim() !== '');
-
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="container mx-auto px-4">
@@ -620,229 +618,490 @@ const FormPage = () => {
               </CardHeader>
               <CardContent className="p-0">
                 {/* Symulacja strony A4 */}
-                <div className="max-h-[75vh] overflow-y-auto">
-                  <div className="bg-white p-8 min-h-[600px] shadow-inner" style={{ fontFamily: 'Times New Roman, serif' }}>
+                <div className="max-h-[80vh] overflow-y-auto">
+                  <div className="bg-white p-6 shadow-inner text-xs" style={{ fontFamily: 'Times New Roman, serif' }}>
                     
                     {/* Nagłówek dokumentu */}
-                    <div className="text-right text-sm mb-4">
-                      oznaczenie sprawy <span className="border-b border-dotted border-gray-400 inline-block min-w-[150px] text-center">
+                    <div className="text-right mb-2">
+                      <span className="text-[10px]">oznaczenie sprawy </span>
+                      <span className="border-b border-dotted border-gray-400 inline-block min-w-[100px] text-center">
                         {formData.oznaczenieSpawy || '...........................'}
                       </span>
-                      <span className="ml-4 font-bold">DRUK ZP-TP</span>
+                      <span className="ml-2 font-bold">DRUK ZP-TP</span>
                     </div>
 
                     {/* Tytuł */}
-                    <h1 className="text-center font-bold text-lg mb-6 mt-8">
+                    <h1 className="text-center font-bold text-sm mb-4 mt-4">
                       PROTOKÓŁ POSTĘPOWANIA W TRYBIE PODSTAWOWYM
                     </h1>
 
-                    <p className="text-sm mb-4">Protokół dotyczy:</p>
-                    <p className="text-sm mb-1 ml-4">• zamówienia publicznego</p>
-                    <p className="text-sm mb-6 ml-4">• umowy ramowej</p>
+                    <p className="mb-2">Protokół dotyczy:</p>
+                    <p className="mb-0.5 ml-2">• zamówienia publicznego</p>
+                    <p className="mb-3 ml-2">• umowy ramowej</p>
 
-                    {/* Tabela z danymi */}
-                    <table className="w-full border-collapse text-sm mb-6">
+                    {/* Tabela z danymi - wszystkie 33 punkty */}
+                    <table className="w-full border-collapse text-[10px] leading-tight">
                       <tbody>
                         {/* 1. Zamawiający */}
                         <tr className="border border-gray-400">
-                          <td className="border border-gray-400 p-2 w-8 align-top font-bold">1.</td>
-                          <td className="border border-gray-400 p-2">
-                            <p className="font-bold mb-2">Zamawiający</p>
-                            <p className="mb-1">Pełna nazwa zamawiającego/zamawiających wspólnie przeprowadzających:</p>
-                            <p className="border-b border-dotted border-gray-400 min-h-[20px] mt-1">
-                              {formData.nazwaZamawiajacego || '.................................................'}
+                          <td className="border border-gray-400 p-1.5 w-6 align-top font-bold">1.</td>
+                          <td className="border border-gray-400 p-1.5">
+                            <p className="font-bold mb-1">Zamawiający</p>
+                            <p className="mb-0.5">Pełna nazwa zamawiającego/zamawiających wspólnie przeprowadzających, w tym zamawiających z innych państw członkowskich Unii Europejskiej:</p>
+                            <p className="border-b border-dotted border-gray-400 min-h-[14px]">
+                              {formData.nazwaZamawiajacego || '...................................................................................................'}
                             </p>
                           </td>
                         </tr>
 
                         {/* 2. Przedmiot zamówienia */}
                         <tr className="border border-gray-400">
-                          <td className="border border-gray-400 p-2 w-8 align-top font-bold">2.</td>
-                          <td className="border border-gray-400 p-2">
-                            <p className="font-bold mb-2">Przedmiot zamówienia</p>
-                            <p className="mb-1">Nazwa przedmiotu zamówienia/umowy ramowej:</p>
-                            <p className="border-b border-dotted border-gray-400 min-h-[20px] mt-1">
-                              {formData.nazwaPrzedmiotu || '.........................................'}
+                          <td className="border border-gray-400 p-1.5 w-6 align-top font-bold">2.</td>
+                          <td className="border border-gray-400 p-1.5">
+                            <p className="font-bold mb-1">Przedmiot zamówienia</p>
+                            <p className="mb-0.5">Nazwa przedmiotu zamówienia/umowy ramowej:</p>
+                            <p className="text-[9px] text-gray-500 mb-0.5">(podać nazwę zamówienia/umowy ramowej nadaną przez zamawiającego)</p>
+                            <p className="border-b border-dotted border-gray-400 min-h-[14px]">
+                              {formData.nazwaPrzedmiotu || '...................................................................................................'}
                             </p>
                           </td>
                         </tr>
 
                         {/* 3. Wartość */}
                         <tr className="border border-gray-400">
-                          <td className="border border-gray-400 p-2 w-8 align-top font-bold">3.</td>
-                          <td className="border border-gray-400 p-2">
-                            <p className="font-bold mb-2">Wartość</p>
-                            <p className="mb-1">
-                              • zamówienia <span className="border-b border-dotted border-gray-400 inline-block min-w-[100px] text-center">
+                          <td className="border border-gray-400 p-1.5 w-6 align-top font-bold">3.</td>
+                          <td className="border border-gray-400 p-1.5">
+                            <p className="font-bold mb-1">Wartość <span className="font-normal text-[9px]">(można wypełnić po otwarciu ofert)</span></p>
+                            <p className="mb-0.5">
+                              • zamówienia <span className="border-b border-dotted border-gray-400 inline-block min-w-[60px] text-center">
                                 {formData.wartoscZamowienia || '.........................'}
-                              </span> zł, co stanowi równowartość <span className="border-b border-dotted border-gray-400 inline-block min-w-[80px] text-center">
+                              </span> zł, co stanowi równowartość <span className="border-b border-dotted border-gray-400 inline-block min-w-[50px] text-center">
                                 {formData.wartoscEuro || '......................'}
                               </span> euro
                             </p>
+                            <p className="mb-0.5">• zamówień (w przypadku dopuszczenia możliwości składania ofert częściowych) z podziałem na części:</p>
+                            <p className="mb-0.5 ml-2">1) ......... 2) ......... 3) .........</p>
+                            <p className="mb-0.5">• zamówienia udzielanego jako część zamówienia o wartości ................... zł</p>
                           </td>
                         </tr>
 
-                        {/* 5. Tryb */}
+                        {/* 4. Wstępne konsultacje rynkowe */}
                         <tr className="border border-gray-400">
-                          <td className="border border-gray-400 p-2 w-8 align-top font-bold">5.</td>
-                          <td className="border border-gray-400 p-2">
-                            <p className="font-bold mb-2">Zamawiający udziela zamówienia w trybie podstawowym:</p>
-                            <p className={`mb-1 ${formData.trybPodstawowy === 'bez_negocjacji' ? 'font-bold' : ''}`}>
+                          <td className="border border-gray-400 p-1.5 w-6 align-top font-bold">4.</td>
+                          <td className="border border-gray-400 p-1.5">
+                            <p className="font-bold mb-1">Wstępne konsultacje rynkowe/wcześniejsze zaangażowanie wykonawcy</p>
+                            <p className="mb-0.5">Przeprowadzono wstępne konsultacje rynkowe, o których mowa w art. 84 ustawy:</p>
+                            <p className="mb-0.5">• nie</p>
+                            <p className="mb-0.5">• tak <span className="text-[9px] text-gray-500">(wypełnić poniżej w przypadku zaznaczenia odpowiedzi „tak")</span></p>
+                            <p className="mb-0.5">Wskazać podmioty, które uczestniczyły: .................................................................</p>
+                          </td>
+                        </tr>
+
+                        {/* 5. Tryb podstawowy */}
+                        <tr className="border border-gray-400">
+                          <td className="border border-gray-400 p-1.5 w-6 align-top font-bold">5.</td>
+                          <td className="border border-gray-400 p-1.5">
+                            <p className="font-bold mb-1">Zamawiający udziela zamówienia w trybie podstawowym:</p>
+                            <p className={`mb-0.5 ${formData.trybPodstawowy === 'bez_negocjacji' ? 'font-bold underline' : ''}`}>
                               • bez możliwości negocjacji, na podstawie art. 275 pkt 1 ustawy
                             </p>
-                            <p className={`mb-1 ${formData.trybPodstawowy === 'mozliwosc_negocjacji' ? 'font-bold' : ''}`}>
+                            <p className={`mb-0.5 ${formData.trybPodstawowy === 'mozliwosc_negocjacji' ? 'font-bold underline' : ''}`}>
                               • z możliwością negocjacji, na podstawie art. 275 pkt 2 ustawy
                             </p>
-                            <p className={`mb-1 ${formData.trybPodstawowy === 'negocjacje' ? 'font-bold' : ''}`}>
+                            <p className={`mb-0.5 ${formData.trybPodstawowy === 'negocjacje' ? 'font-bold underline' : ''}`}>
                               • z negocjacjami, na podstawie art. 275 pkt 3 ustawy
                             </p>
                           </td>
                         </tr>
 
+                        {/* 6. Osoby wykonujące czynności */}
+                        <tr className="border border-gray-400">
+                          <td className="border border-gray-400 p-1.5 w-6 align-top font-bold">6.</td>
+                          <td className="border border-gray-400 p-1.5">
+                            <p className="font-bold mb-1">Osoby wykonujące czynności związane z przeprowadzeniem postępowania</p>
+                            <p className="mb-0.5 text-[9px]">(jeżeli czynności związane z przeprowadzeniem postępowania lub mogące wpłynąć na wynik postępowania, wykonuje kierownik zamawiającego...)</p>
+                            <p className="mb-0.5">A. Imiona i nazwiska osób wykonujących czynności:</p>
+                            <p className="border-b border-dotted border-gray-400 min-h-[14px]">
+                              {formData.osobyWykonujace || '...................................................................................................'}
+                            </p>
+                            <p className="mb-0.5 mt-1">B. Oświadczenia, o których mowa w art. 56 ust. 4 ustawy:</p>
+                            <p className="mb-0.5">• złożono oświadczenia</p>
+                            <p className="mb-0.5">• nie złożono oświadczeń</p>
+                            <p className="mb-0.5 mt-1">C. Komisja przetargowa:</p>
+                            <p className="mb-0.5">• została powołana w dniu ...........</p>
+                            <p className="mb-0.5">• nie została powołana</p>
+                            <p className="mb-0.5 mt-1">D. Informacje o istnieniu okoliczności, o których mowa w art. 56 ust. 2 ustawy:</p>
+                            <p className="border-b border-dotted border-gray-400 min-h-[14px]">................................................................................................</p>
+                          </td>
+                        </tr>
+
                         {/* 7. Ogłoszenie o zamówieniu */}
                         <tr className="border border-gray-400">
-                          <td className="border border-gray-400 p-2 w-8 align-top font-bold">7.</td>
-                          <td className="border border-gray-400 p-2">
-                            <p className="font-bold mb-2">Ogłoszenie o zamówieniu</p>
-                            <p className="mb-1">
-                              1. Ogłoszenie o zamówieniu zostało zamieszczone w BZP w dniu <span className="border-b border-dotted border-gray-400 inline-block min-w-[100px] text-center">
+                          <td className="border border-gray-400 p-1.5 w-6 align-top font-bold">7.</td>
+                          <td className="border border-gray-400 p-1.5">
+                            <p className="font-bold mb-1">Ogłoszenie o zamówieniu</p>
+                            <p className="mb-0.5">
+                              1. Ogłoszenie o zamówieniu zostało zamieszczone w BZP w dniu <span className="border-b border-dotted border-gray-400 inline-block min-w-[70px] text-center">
                                 {formData.dataOgloszeniaBZP ? new Date(formData.dataOgloszeniaBZP).toLocaleDateString('pl-PL') : '..........................'}
-                              </span> r., pod nr <span className="border-b border-dotted border-gray-400 inline-block min-w-[120px] text-center">
+                              </span> r., pod nr <span className="border-b border-dotted border-gray-400 inline-block min-w-[80px] text-center">
                                 {formData.numerOgloszeniaBZP || '.................'}
                               </span>
                             </p>
+                            <p className="mb-0.5 text-[9px] text-gray-500">(załączyć dowód zamieszczenia ogłoszenia w BZP)</p>
+                            <p className="mb-0.5 mt-1">2. Zmiana treści ogłoszenia:</p>
+                            <p className="mb-0.5">• nie zmieniono treści ogłoszenia</p>
+                            <p className="mb-0.5">• zmieniono treść ogłoszenia w dniu ................... (załączyć dowód)</p>
+                          </td>
+                        </tr>
+
+                        {/* 8. Powody odstąpienia */}
+                        <tr className="border border-gray-400">
+                          <td className="border border-gray-400 p-1.5 w-6 align-top font-bold">8.</td>
+                          <td className="border border-gray-400 p-1.5">
+                            <p className="font-bold mb-1">Powody odstąpienia od wymogu użycia środków komunikacji elektronicznej</p>
+                            <p className="text-[9px] text-gray-500 mb-0.5">(podać podstawę prawną i uzasadnienie faktyczne oraz czego dotyczy odstąpienie)</p>
+                            <p className="border-b border-dotted border-gray-400 min-h-[14px]">...................................................................................................</p>
                           </td>
                         </tr>
 
                         {/* 9. SWZ */}
                         <tr className="border border-gray-400">
-                          <td className="border border-gray-400 p-2 w-8 align-top font-bold">9.</td>
-                          <td className="border border-gray-400 p-2">
-                            <p className="font-bold mb-2">Specyfikacja warunków zamówienia (SWZ)</p>
-                            <p className="mb-1">SWZ została udostępniona na stronie internetowej prowadzonego postępowania:</p>
-                            <p className="border-b border-dotted border-gray-400 min-h-[20px] mt-1">
-                              {formData.adresSWZ || '......................................................................................'}
+                          <td className="border border-gray-400 p-1.5 w-6 align-top font-bold">9.</td>
+                          <td className="border border-gray-400 p-1.5">
+                            <p className="font-bold mb-1">Specyfikacja warunków zamówienia (SWZ)</p>
+                            <p className="text-[9px] text-gray-500 mb-0.5">(dotyczy trybu podstawowego, o którym mowa w art. 275 pkt 1 i 2 ustawy)</p>
+                            <p className="mb-0.5">SWZ została udostępniona na stronie internetowej prowadzonego postępowania (podać adres strony):</p>
+                            <p className="border-b border-dotted border-gray-400 min-h-[14px]">
+                              {formData.adresSWZ || '...................................................................................................'}
                             </p>
+                          </td>
+                        </tr>
+
+                        {/* 10. Opis potrzeb i wymagań */}
+                        <tr className="border border-gray-400">
+                          <td className="border border-gray-400 p-1.5 w-6 align-top font-bold">10.</td>
+                          <td className="border border-gray-400 p-1.5">
+                            <p className="font-bold mb-1">Opis potrzeb i wymagań oraz SWZ</p>
+                            <p className="text-[9px] text-gray-500 mb-0.5">(dotyczy trybu podstawowego, o którym mowa w art. 275 pkt 3)</p>
+                            <p className="mb-0.5">1. Opis potrzeb i wymagań został udostępniony na stronie internetowej: ...............</p>
+                            <p className="mb-0.5">2. SWZ została udostępniona na stronie internetowej od dnia: ...............</p>
                           </td>
                         </tr>
 
                         {/* 11. Termin składania ofert */}
                         <tr className="border border-gray-400">
-                          <td className="border border-gray-400 p-2 w-8 align-top font-bold">11.</td>
-                          <td className="border border-gray-400 p-2">
-                            <p className="font-bold mb-2">Sposób i termin składania ofert</p>
-                            <p className="mb-1">
-                              1. Termin składania ofert upłynął w dniu <span className="border-b border-dotted border-gray-400 inline-block min-w-[100px] text-center">
+                          <td className="border border-gray-400 p-1.5 w-6 align-top font-bold">11.</td>
+                          <td className="border border-gray-400 p-1.5">
+                            <p className="font-bold mb-1">Sposób i termin składania ofert</p>
+                            <p className="text-[9px] text-gray-500 mb-0.5">(dotyczy ofert składanych w odpowiedzi na ogłoszenie o zamówieniu)</p>
+                            <p className="mb-0.5">
+                              1. Termin składania ofert upłynął w dniu <span className="border-b border-dotted border-gray-400 inline-block min-w-[70px] text-center">
                                 {formData.terminSkladaniaOfertData ? new Date(formData.terminSkladaniaOfertData).toLocaleDateString('pl-PL') : '................'}
-                              </span> r. o godz. <span className="border-b border-dotted border-gray-400 inline-block min-w-[50px] text-center">
+                              </span> r. o godz. <span className="border-b border-dotted border-gray-400 inline-block min-w-[30px] text-center">
                                 {formData.terminSkladaniaOfertGodzina || '......'}
                               </span>
                             </p>
+                            <p className="mb-0.5">2. Wymóg składania ofert wyłącznie przy użyciu środków komunikacji elektronicznej:</p>
+                            <p className="mb-0.5">• zachowano wymóg</p>
+                            <p className="mb-0.5">• nie zachowano wymogu (podać przyczynę): ...................</p>
                           </td>
                         </tr>
 
                         {/* 12. Otwarcie ofert */}
                         <tr className="border border-gray-400">
-                          <td className="border border-gray-400 p-2 w-8 align-top font-bold">12.</td>
-                          <td className="border border-gray-400 p-2">
-                            <p className="font-bold mb-2">Otwarcie ofert</p>
-                            <p className="mb-1">
-                              Otwarcie ofert nastąpiło w dniu <span className="border-b border-dotted border-gray-400 inline-block min-w-[100px] text-center">
-                                {formData.dataOtwarciaOfert ? new Date(formData.dataOtwarciaOfert).toLocaleDateString('pl-PL') : '................'}
-                              </span> r. o godz. <span className="border-b border-dotted border-gray-400 inline-block min-w-[50px] text-center">
-                                {formData.godzinaOtwarciaOfert || '......'}
+                          <td className="border border-gray-400 p-1.5 w-6 align-top font-bold">12.</td>
+                          <td className="border border-gray-400 p-1.5">
+                            <p className="font-bold mb-1">Otwarcie ofert</p>
+                            <p className="text-[9px] text-gray-500 mb-0.5">(dotyczy ofert składanych w odpowiedzi na ogłoszenie o zamówieniu)</p>
+                            <p className="mb-0.5">1. W postępowaniu:</p>
+                            <p className="mb-0.5">• nie wpłynęła żadna oferta</p>
+                            <p className="mb-0.5">• wpłynęły oferty</p>
+                            <p className="mb-0.5">
+                              2. Otwarcie ofert nastąpiło w dniu <span className="border-b border-dotted border-gray-400 inline-block min-w-[70px] text-center">
+                                {formData.dataOtwarciaOfert ? new Date(formData.dataOtwarciaOfert).toLocaleDateString('pl-PL') : '.....................'}
+                              </span> r. o godz. <span className="border-b border-dotted border-gray-400 inline-block min-w-[30px] text-center">
+                                {formData.godzinaOtwarciaOfert || '....'}
                               </span>
                             </p>
+                          </td>
+                        </tr>
+
+                        {/* 13. Zestawienie ofert */}
+                        <tr className="border border-gray-400">
+                          <td className="border border-gray-400 p-1.5 w-6 align-top font-bold">13.</td>
+                          <td className="border border-gray-400 p-1.5">
+                            <p className="font-bold mb-1">Zestawienie ofert</p>
+                            <p className="text-[9px] text-gray-500 mb-0.5">(dotyczy ofert składanych w odpowiedzi na ogłoszenie o zamówieniu)</p>
+                            <p className="mb-0.5">Do upływu terminu składania ofert złożono następujące oferty:</p>
+                            <table className="w-full border-collapse text-[9px] mt-1">
+                              <thead>
+                                <tr>
+                                  <th className="border border-gray-300 p-0.5 w-6">Nr</th>
+                                  <th className="border border-gray-300 p-0.5">Nazwa wykonawcy</th>
+                                  <th className="border border-gray-300 p-0.5">Cena/koszt</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                <tr><td className="border border-gray-300 p-0.5">1.</td><td className="border border-gray-300 p-0.5">..................</td><td className="border border-gray-300 p-0.5">........</td></tr>
+                                <tr><td className="border border-gray-300 p-0.5">2.</td><td className="border border-gray-300 p-0.5">..................</td><td className="border border-gray-300 p-0.5">........</td></tr>
+                              </tbody>
+                            </table>
+                          </td>
+                        </tr>
+
+                        {/* 14. Oferty odrzucone */}
+                        <tr className="border border-gray-400">
+                          <td className="border border-gray-400 p-1.5 w-6 align-top font-bold">14.</td>
+                          <td className="border border-gray-400 p-1.5">
+                            <p className="font-bold mb-1">Oferty odrzucone</p>
+                            <p className="mb-0.5">Odrzucono oferty:</p>
+                            <p className="mb-0.5">• nie</p>
+                            <p className="mb-0.5">• tak, odrzucono oferty następujących wykonawców:</p>
+                            <p className="mb-0.5 ml-2">1. ........................... Podstawa prawna i powód: ...........................</p>
+                          </td>
+                        </tr>
+
+                        {/* 15. Ograniczenie liczby wykonawców */}
+                        <tr className="border border-gray-400">
+                          <td className="border border-gray-400 p-1.5 w-6 align-top font-bold">15.</td>
+                          <td className="border border-gray-400 p-1.5">
+                            <p className="font-bold mb-1">Ograniczenie liczby wykonawców zaproszonych do negocjacji</p>
+                            <p className="text-[9px] text-gray-500 mb-0.5">(dotyczy trybu podstawowego, o którym mowa w art. 275 pkt 2 i 3 ustawy)</p>
+                            <p className="mb-0.5">Zaproszono do negocjacji następujących wykonawców: .................................</p>
+                          </td>
+                        </tr>
+
+                        {/* 16. Negocjacje */}
+                        <tr className="border border-gray-400">
+                          <td className="border border-gray-400 p-1.5 w-6 align-top font-bold">16.</td>
+                          <td className="border border-gray-400 p-1.5">
+                            <p className="font-bold mb-1">Negocjacje</p>
+                            <p className="text-[9px] text-gray-500 mb-0.5">(dotyczy trybu podstawowego, o którym mowa w art. 275 pkt 2 i 3 ustawy)</p>
+                            <p className="mb-0.5">1. Zaproszenie do negocjacji zostało przekazane w dniu ......</p>
+                            <p className="mb-0.5">2. Negocjacje odbyły się w dniu .........</p>
+                          </td>
+                        </tr>
+
+                        {/* 17. Zaproszenie do składania ofert */}
+                        <tr className="border border-gray-400">
+                          <td className="border border-gray-400 p-1.5 w-6 align-top font-bold">17.</td>
+                          <td className="border border-gray-400 p-1.5">
+                            <p className="font-bold mb-1">Zaproszenie do składania ofert dodatkowych/ofert ostatecznych</p>
+                            <p className="text-[9px] text-gray-500 mb-0.5">(dotyczy trybu podstawowego, o którym mowa w art. 275 pkt 2 i 3 ustawy)</p>
+                            <p className="mb-0.5">Zaproszenie zostało przekazane w dniu ..................</p>
+                          </td>
+                        </tr>
+
+                        {/* 18. Miejsce i termin składania ofert dodatkowych */}
+                        <tr className="border border-gray-400">
+                          <td className="border border-gray-400 p-1.5 w-6 align-top font-bold">18.</td>
+                          <td className="border border-gray-400 p-1.5">
+                            <p className="font-bold mb-1">Miejsce i termin składania ofert dodatkowych/ofert ostatecznych</p>
+                            <p className="mb-0.5">Termin składania ofert upłynął w dniu .............. r. o godz. ..........</p>
+                          </td>
+                        </tr>
+
+                        {/* 19. Otwarcie ofert dodatkowych */}
+                        <tr className="border border-gray-400">
+                          <td className="border border-gray-400 p-1.5 w-6 align-top font-bold">19.</td>
+                          <td className="border border-gray-400 p-1.5">
+                            <p className="font-bold mb-1">Otwarcie ofert dodatkowych/ofert ostatecznych</p>
+                            <p className="mb-0.5">1. W postępowaniu: • nie wpłynęła żadna oferta • wpłynęły oferty</p>
+                            <p className="mb-0.5">2. Otwarcie nastąpiło w dniu .............. r. o godz. ..........</p>
+                          </td>
+                        </tr>
+
+                        {/* 20. Zestawienie ofert dodatkowych */}
+                        <tr className="border border-gray-400">
+                          <td className="border border-gray-400 p-1.5 w-6 align-top font-bold">20.</td>
+                          <td className="border border-gray-400 p-1.5">
+                            <p className="font-bold mb-1">Zestawienie ofert dodatkowych/ofert ostatecznych</p>
+                            <p className="mb-0.5">Do upływu terminu składania ofert złożono następujące oferty: ...................</p>
+                          </td>
+                        </tr>
+
+                        {/* 21. Oferty odrzucone (dodatkowe) */}
+                        <tr className="border border-gray-400">
+                          <td className="border border-gray-400 p-1.5 w-6 align-top font-bold">21.</td>
+                          <td className="border border-gray-400 p-1.5">
+                            <p className="font-bold mb-1">Oferty odrzucone</p>
+                            <p className="text-[9px] text-gray-500 mb-0.5">(dotyczy ofert dodatkowych/ostatecznych)</p>
+                            <p className="mb-0.5">• nie odrzucono ofert</p>
+                            <p className="mb-0.5">• tak, odrzucono oferty: ...........................</p>
                           </td>
                         </tr>
 
                         {/* 22. Najkorzystniejsza oferta */}
                         <tr className="border border-gray-400">
-                          <td className="border border-gray-400 p-2 w-8 align-top font-bold">22.</td>
-                          <td className="border border-gray-400 p-2">
-                            <p className="font-bold mb-2">Najkorzystniejsza oferta</p>
-                            <p className="mb-1">
-                              Jako najkorzystniejszą wybrano ofertę wykonawcy: <span className="border-b border-dotted border-gray-400 inline-block min-w-[200px]">
+                          <td className="border border-gray-400 p-1.5 w-6 align-top font-bold">22.</td>
+                          <td className="border border-gray-400 p-1.5">
+                            <p className="font-bold mb-1">Najkorzystniejsza oferta</p>
+                            <p className="mb-0.5">1. Zastosowanie aukcji elektronicznej:</p>
+                            <p className="mb-0.5">• nie zostało przewidziane</p>
+                            <p className="mb-0.5">• zostało przewidziane</p>
+                            <p className="mb-0.5 mt-1">Najkorzystniejszą ofertę wybrano:</p>
+                            <p className="mb-0.5">• z zastosowaniem aukcji elektronicznej</p>
+                            <p className="mb-0.5">• bez zastosowania aukcji elektronicznej</p>
+                            <p className="mb-0.5 mt-1">
+                              2. Jako najkorzystniejszą wybrano ofertę wykonawcy: <span className="border-b border-dotted border-gray-400 inline-block min-w-[100px]">
                                 {formData.nazwaWykonawcy || '.......................................'}
                               </span>
                             </p>
-                            <p className="mb-1">
-                              na kwotę: <span className="border-b border-dotted border-gray-400 inline-block min-w-[100px] text-center">
+                            <p className="mb-0.5">
+                              na kwotę: <span className="border-b border-dotted border-gray-400 inline-block min-w-[60px] text-center">
                                 {formData.kwotaOferty || '.........................'}
                               </span> zł
                             </p>
-                            {formData.uzasadnienieWyboru && (
-                              <p className="mb-1 mt-2">
-                                <span className="font-semibold">Uzasadnienie:</span> {formData.uzasadnienieWyboru}
-                              </p>
-                            )}
+                            <p className="mb-0.5">Uzasadnienie wyboru: {formData.uzasadnienieWyboru || '......................................'}</p>
+                          </td>
+                        </tr>
+
+                        {/* 23. Unieważnienie postępowania */}
+                        <tr className="border border-gray-400">
+                          <td className="border border-gray-400 p-1.5 w-6 align-top font-bold">23.</td>
+                          <td className="border border-gray-400 p-1.5">
+                            <p className="font-bold mb-1">Unieważnienie postępowania <span className="font-normal text-[9px]">(jeżeli dotyczy)</span></p>
+                            <p className="mb-0.5">Powody unieważnienia (podać podstawę prawną i uzasadnienie faktyczne):</p>
+                            <p className="border-b border-dotted border-gray-400 min-h-[14px]">...................................................................................................</p>
+                          </td>
+                        </tr>
+
+                        {/* 24. Zatwierdzenie prac komisji */}
+                        <tr className="border border-gray-400">
+                          <td className="border border-gray-400 p-1.5 w-6 align-top font-bold">24.</td>
+                          <td className="border border-gray-400 p-1.5">
+                            <p className="font-bold mb-1">Zatwierdzenie prac komisji przetargowej/osób wykonujących czynności</p>
+                            <p className="mb-0.5">Prace • komisji przetargowej • osób wykonujących czynności związane z przeprowadzeniem postępowania zakończyły się w dniu ..................</p>
+                          </td>
+                        </tr>
+
+                        {/* 25. Zawiadomienie o wyborze */}
+                        <tr className="border border-gray-400">
+                          <td className="border border-gray-400 p-1.5 w-6 align-top font-bold">25.</td>
+                          <td className="border border-gray-400 p-1.5">
+                            <p className="font-bold mb-1">Zawiadomienie o wyborze najkorzystniejszej oferty/unieważnieniu postępowania</p>
+                            <p className="mb-0.5">Zawiadomienie o:</p>
+                            <p className="mb-0.5">• wyborze najkorzystniejszej oferty</p>
+                            <p className="mb-0.5">• unieważnieniu postępowania</p>
+                            <p className="mb-0.5">zostało przesłane w dniu ................ r. w sposób: ...................................</p>
+                          </td>
+                        </tr>
+
+                        {/* 26. Środki ochrony prawnej */}
+                        <tr className="border border-gray-400">
+                          <td className="border border-gray-400 p-1.5 w-6 align-top font-bold">26.</td>
+                          <td className="border border-gray-400 p-1.5">
+                            <p className="font-bold mb-1">Środki ochrony prawnej</p>
+                            <p className="mb-0.5">1. W trakcie postępowania:</p>
+                            <p className="mb-0.5">• nie wniesiono odwołania</p>
+                            <p className="mb-0.5">• wykonawca ............................... wniósł odwołanie w dniu ...................... r., na ..........................................</p>
+                          </td>
+                        </tr>
+
+                        {/* 27. Czynności nowe/powtórzone */}
+                        <tr className="border border-gray-400">
+                          <td className="border border-gray-400 p-1.5 w-6 align-top font-bold">27.</td>
+                          <td className="border border-gray-400 p-1.5">
+                            <p className="font-bold mb-1">Czynności nowe/czynności powtórzone</p>
+                            <p className="mb-0.5">• nie dokonano nowych czynności/nie powtórzono czynności</p>
+                            <p className="mb-0.5">• dokonano nowych czynności/powtórzono następujące czynności:</p>
+                            <p className="border-b border-dotted border-gray-400 min-h-[14px]">.............................................................................................</p>
+                          </td>
+                        </tr>
+
+                        {/* 28. Zatwierdzenie po dokonaniu czynności */}
+                        <tr className="border border-gray-400">
+                          <td className="border border-gray-400 p-1.5 w-6 align-top font-bold">28.</td>
+                          <td className="border border-gray-400 p-1.5">
+                            <p className="font-bold mb-1">Zatwierdzenie po dokonaniu czynności nowych/czynności powtórzonych</p>
+                            <p className="mb-0.5">1. Prace • komisji przetargowej • osób wykonujących czynności zakończyły się w dniu ............... r.</p>
+                            <p className="mb-0.5">1) ............... 2) ...............</p>
                           </td>
                         </tr>
 
                         {/* 29. Udzielenie zamówienia */}
                         <tr className="border border-gray-400">
-                          <td className="border border-gray-400 p-2 w-8 align-top font-bold">29.</td>
-                          <td className="border border-gray-400 p-2">
-                            <p className="font-bold mb-2">Udzielenie zamówienia</p>
-                            <p className="mb-1">
-                              1. Umowa została zawarta w dniu <span className="border-b border-dotted border-gray-400 inline-block min-w-[100px] text-center">
+                          <td className="border border-gray-400 p-1.5 w-6 align-top font-bold">29.</td>
+                          <td className="border border-gray-400 p-1.5">
+                            <p className="font-bold mb-1">Udzielenie zamówienia</p>
+                            <p className="mb-0.5">
+                              1. Umowa/umowa ramowa została zawarta w dniu <span className="border-b border-dotted border-gray-400 inline-block min-w-[60px] text-center">
                                 {formData.dataZawarciaUmowy ? new Date(formData.dataZawarciaUmowy).toLocaleDateString('pl-PL') : '...............'}
-                              </span> r., z <span className="border-b border-dotted border-gray-400 inline-block min-w-[200px]">
+                              </span> r., z <span className="border-b border-dotted border-gray-400 inline-block min-w-[100px]">
                                 {formData.wykonawcaUmowy || '.......................................'}
                               </span>
                             </p>
-                            <p className="mb-1">
-                              na kwotę <span className="border-b border-dotted border-gray-400 inline-block min-w-[100px] text-center">
+                            <p className="mb-0.5">
+                              na kwotę <span className="border-b border-dotted border-gray-400 inline-block min-w-[60px] text-center">
                                 {formData.kwotaUmowy || '.........................'}
                               </span> zł
                             </p>
-                          </td>
-                        </tr>
-
-                        {/* Ogłoszenie o wyniku */}
-                        <tr className="border border-gray-400">
-                          <td className="border border-gray-400 p-2 w-8 align-top font-bold"></td>
-                          <td className="border border-gray-400 p-2">
-                            <p className="mb-1">
-                              2. Ogłoszenie o wyniku postępowania zostało zamieszczone w BZP w dniu <span className="border-b border-dotted border-gray-400 inline-block min-w-[100px] text-center">
-                                {formData.dataOgloszeniaWyniku ? new Date(formData.dataOgloszeniaWyniku).toLocaleDateString('pl-PL') : '........................'}
-                              </span> r. pod nr <span className="border-b border-dotted border-gray-400 inline-block min-w-[120px] text-center">
+                            <p className="mb-0.5 mt-1">
+                              2. Ogłoszenie o wyniku postępowania zostało zamieszczone w BZP w dniu <span className="border-b border-dotted border-gray-400 inline-block min-w-[60px] text-center">
+                                {formData.dataOgloszeniaWyniku ? new Date(formData.dataOgloszeniaWyniku).toLocaleDateString('pl-PL') : '..............'}
+                              </span> r. pod nr <span className="border-b border-dotted border-gray-400 inline-block min-w-[80px] text-center">
                                 {formData.numerOgloszeniaWyniku || '.................'}
                               </span>
                             </p>
+                            <p className="text-[9px] text-gray-500">(załączyć dowód zamieszczenia ogłoszenia w BZP)</p>
                           </td>
                         </tr>
 
-                        {/* 32. Osoba sporządzająca */}
+                        {/* 30. Załączniki do protokołu */}
                         <tr className="border border-gray-400">
-                          <td className="border border-gray-400 p-2 w-8 align-top font-bold">32.</td>
-                          <td className="border border-gray-400 p-2">
-                            <p className="font-bold mb-2">Osoba sporządzająca protokół</p>
-                            <p className="mb-1">
-                              Protokół sporządził: <span className="border-b border-dotted border-gray-400 inline-block min-w-[250px]">
+                          <td className="border border-gray-400 p-1.5 w-6 align-top font-bold">30.</td>
+                          <td className="border border-gray-400 p-1.5">
+                            <p className="font-bold mb-1">Załączniki do protokołu</p>
+                            <p className="mb-0.5">Następujące dokumenty stanowią załączniki do protokołu: (wymienić wszystkie załączniki)</p>
+                            <p className="mb-0.5">1. ................................................................................................</p>
+                            <p className="mb-0.5">2. ................................................................................................</p>
+                            <p className="mb-0.5">3. ................................................................................................</p>
+                          </td>
+                        </tr>
+
+                        {/* 31. Uwagi do protokołu */}
+                        <tr className="border border-gray-400">
+                          <td className="border border-gray-400 p-1.5 w-6 align-top font-bold">31.</td>
+                          <td className="border border-gray-400 p-1.5">
+                            <p className="font-bold mb-1">Uwagi do protokołu</p>
+                            <p className="mb-0.5">1. Osoby wykonujące czynności związane z przeprowadzeniem postępowania:</p>
+                            <p className="mb-0.5">• nie zapoznały się z treścią protokołu (podać imię i nazwisko)</p>
+                            <p className="mb-0.5 ml-2">1) ........................... 2) ...........................</p>
+                            <p className="mb-0.5">• zapoznały się z treścią protokołu i wnoszą następujące uwagi:</p>
+                            <p className="border-b border-dotted border-gray-400 min-h-[14px]">................................................................................................</p>
+                          </td>
+                        </tr>
+
+                        {/* 32. Osoba sporządzająca protokół */}
+                        <tr className="border border-gray-400">
+                          <td className="border border-gray-400 p-1.5 w-6 align-top font-bold">32.</td>
+                          <td className="border border-gray-400 p-1.5">
+                            <p className="font-bold mb-1">Osoba sporządzająca protokół</p>
+                            <p className="mb-0.5">
+                              Protokół sporządził: <span className="border-b border-dotted border-gray-400 inline-block min-w-[150px]">
                                 {formData.osobaSPorzadzajaca || '......................................................................................'}
                               </span>
                             </p>
-                            <p className="text-xs text-gray-500 ml-28">(imię i nazwisko)</p>
+                            <p className="text-[9px] text-gray-500">(imię i nazwisko osoby sporządzającej protokół)</p>
                             {formData.dataSporzadzenia && (
-                              <p className="mt-2">Data: {new Date(formData.dataSporzadzenia).toLocaleDateString('pl-PL')}</p>
+                              <p className="mt-1">Data: {new Date(formData.dataSporzadzenia).toLocaleDateString('pl-PL')}</p>
                             )}
                           </td>
                         </tr>
 
-                        {/* 33. Zatwierdzenie */}
+                        {/* 33. Zatwierdzenie protokołu */}
                         <tr className="border border-gray-400">
-                          <td className="border border-gray-400 p-2 w-8 align-top font-bold">33.</td>
-                          <td className="border border-gray-400 p-2">
-                            <p className="font-bold mb-2">Zatwierdzenie protokołu</p>
-                            <p className="mb-1">
-                              <span className="border-b border-dotted border-gray-400 inline-block min-w-[250px]">
+                          <td className="border border-gray-400 p-1.5 w-6 align-top font-bold">33.</td>
+                          <td className="border border-gray-400 p-1.5">
+                            <p className="font-bold mb-1">Zatwierdzenie protokołu</p>
+                            <p className="mb-0.5">
+                              <span className="border-b border-dotted border-gray-400 inline-block min-w-[200px]">
                                 {formData.osobaZatwierdzajaca || '...........................................................................................................'}
                               </span>
                             </p>
-                            <p className="text-xs text-gray-500">(imię i nazwisko kierownika zamawiającego lub osoby upoważnionej)</p>
+                            <p className="text-[9px] text-gray-500">(imię i nazwisko kierownika zamawiającego/pracownika zamawiającego, któremu kierownik powierzył pisemnie wykonanie zastrzeżonych dla siebie czynności)</p>
                             {formData.dataZatwierdzenia && (
-                              <p className="mt-2">Data: {new Date(formData.dataZatwierdzenia).toLocaleDateString('pl-PL')}</p>
+                              <p className="mt-1">Data: {new Date(formData.dataZatwierdzenia).toLocaleDateString('pl-PL')}</p>
                             )}
                           </td>
                         </tr>
@@ -850,7 +1109,7 @@ const FormPage = () => {
                     </table>
 
                     {/* Stopka */}
-                    <div className="border-t border-gray-300 pt-4 mt-8 text-center text-xs text-gray-500">
+                    <div className="border-t border-gray-300 pt-2 mt-4 text-center text-[9px] text-gray-500">
                       <p>..................................................................</p>
                       <p>numer strony &nbsp;&nbsp;&nbsp; (podpis osoby sporządzającej protokół)</p>
                     </div>
