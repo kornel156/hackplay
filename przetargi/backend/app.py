@@ -5,129 +5,241 @@ from docx.shared import Pt, Inches
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 import io
 import os
+import re
 
 app = Flask(__name__)
 CORS(app)
+
+def format_date(date_str):
+    """Konwertuje datę z formatu YYYY-MM-DD na DD.MM.YYYY"""
+    if not date_str:
+        return ''
+    try:
+        parts = date_str.split('-')
+        if len(parts) == 3:
+            return f"{parts[2]}.{parts[1]}.{parts[0]}"
+    except:
+        pass
+    return date_str
+
+def replace_in_paragraph(paragraph, old_text, new_text):
+    """Zamienia tekst w paragrafie zachowując formatowanie"""
+    if old_text in paragraph.text:
+        inline = paragraph.runs
+        for run in inline:
+            if old_text in run.text:
+                run.text = run.text.replace(old_text, new_text)
+
+def replace_in_cell(cell, replacements):
+    """Zamienia tekst w komórce tabeli"""
+    for paragraph in cell.paragraphs:
+        for old_text, new_text in replacements.items():
+            if old_text in paragraph.text:
+                # Próbujemy zastąpić w runach
+                for run in paragraph.runs:
+                    for old, new in replacements.items():
+                        if old in run.text:
+                            run.text = run.text.replace(old, new if new else '..................')
+
+def fill_template(template_path, data):
+    """Wypełnia szablon dokumentu danymi z formularza"""
+    doc = Document(template_path)
+    
+    # Mapowanie pól formularza na miejsca w dokumencie
+    replacements = {
+        # Oznaczenie sprawy (w nagłówkach)
+        '...........................': data.get('oznaczenieSpawy', ''),
+        
+        # Zamawiający
+        '.................................................': data.get('nazwaZamawiajacego', ''),
+        
+        # Przedmiot zamówienia
+        '.........................................': data.get('nazwaPrzedmiotu', ''),
+        '............................': data.get('nazwaPrzedmiotu', ''),
+        
+        # Wartość
+        '.........................': data.get('wartoscZamowienia', ''),
+        '......................': data.get('wartoscEuro', ''),
+        
+        # Data ogłoszenia BZP
+        '.............................. r.': format_date(data.get('dataOgloszeniaBZP', '')) + ' r.' if data.get('dataOgloszeniaBZP') else '.............................. r.',
+        
+        # Numer ogłoszenia
+        '.................': data.get('numerOgloszeniaBZP', ''),
+        
+        # Termin składania ofert
+        '................ ...............': format_date(data.get('terminSkladaniaOfertData', '')),
+        '....... : .': data.get('terminSkladaniaOfertGodzina', '').replace(':', ':') if data.get('terminSkladaniaOfertGodzina') else '....... : .',
+        
+        # Data zawarcia umowy
+        '............... r.': format_date(data.get('dataZawarciaUmowy', '')) + ' r.' if data.get('dataZawarciaUmowy') else '............... r.',
+        
+        # Wykonawca umowy
+        '.......................................': data.get('wykonawcaUmowy', ''),
+        '......................................': data.get('wykonawcaUmowy', ''),
+        
+        # Osoba sporządzająca
+        '......................................................................................': data.get('osobaSPorzadzajaca', ''),
+    }
+    
+    # Zamiana w paragrafach
+    for paragraph in doc.paragraphs:
+        full_text = paragraph.text
+        for old_text, new_text in replacements.items():
+            if old_text in full_text and new_text:
+                for run in paragraph.runs:
+                    if old_text in run.text:
+                        run.text = run.text.replace(old_text, new_text)
+    
+    # Zamiana w tabelach
+    for table in doc.tables:
+        for row in table.rows:
+            for cell in row.cells:
+                cell_text = cell.text
+                for old_text, new_text in replacements.items():
+                    if old_text in cell_text and new_text:
+                        for paragraph in cell.paragraphs:
+                            for run in paragraph.runs:
+                                if old_text in run.text:
+                                    run.text = run.text.replace(old_text, new_text)
+    
+    # Specjalne wypełnienie dla konkretnych tabel
+    # Tabela 0 - Zamawiający i przedmiot
+    if len(doc.tables) > 0:
+        table = doc.tables[0]
+        # Wiersz 0 - Zamawiający
+        if data.get('nazwaZamawiajacego'):
+            cell = table.rows[0].cells[1]
+            for para in cell.paragraphs:
+                if '.................................................' in para.text:
+                    for run in para.runs:
+                        run.text = run.text.replace('.................................................', data['nazwaZamawiajacego'])
+        
+        # Wiersz 1 - Przedmiot zamówienia
+        if data.get('nazwaPrzedmiotu'):
+            cell = table.rows[1].cells[1]
+            for para in cell.paragraphs:
+                for run in para.runs:
+                    if '.........................................' in run.text:
+                        run.text = run.text.replace('.........................................', data['nazwaPrzedmiotu'])
+        
+        # Wiersz 2 - Wartość
+        if data.get('wartoscZamowienia'):
+            cell = table.rows[2].cells[1]
+            for para in cell.paragraphs:
+                for run in para.runs:
+                    if '.........................' in run.text:
+                        run.text = run.text.replace('.........................', data['wartoscZamowienia'])
+                    if '......................' in run.text:
+                        run.text = run.text.replace('......................', data.get('wartoscEuro', ''))
+    
+    # Tabela 3 - Ogłoszenie o zamówieniu
+    if len(doc.tables) > 3:
+        table = doc.tables[3]
+        # Wiersz 1 - Ogłoszenie BZP
+        if data.get('dataOgloszeniaBZP') or data.get('numerOgloszeniaBZP'):
+            cell = table.rows[1].cells[1]
+            for para in cell.paragraphs:
+                for run in para.runs:
+                    if '.............................. r.' in run.text:
+                        run.text = run.text.replace('.............................. r.', format_date(data.get('dataOgloszeniaBZP', '')) + ' r.')
+                    if '.................' in run.text:
+                        run.text = run.text.replace('.................', data.get('numerOgloszeniaBZP', ''))
+        
+        # Wiersz 3 - SWZ adres
+        if data.get('adresSWZ'):
+            cell = table.rows[3].cells[1]
+            for para in cell.paragraphs:
+                for run in para.runs:
+                    if '......................' in run.text:
+                        run.text = run.text.replace('......................', data['adresSWZ'])
+    
+    # Tabela 4 - Termin składania i otwarcie ofert
+    if len(doc.tables) > 4:
+        table = doc.tables[4]
+        # SWZ adres
+        if data.get('adresSWZ'):
+            cell = table.rows[0].cells[1]
+            for para in cell.paragraphs:
+                for run in para.runs:
+                    if '......................' in run.text:
+                        run.text = run.text.replace('......................', data['adresSWZ'])
+        
+        # Termin składania ofert
+        if data.get('terminSkladaniaOfertData'):
+            cell = table.rows[1].cells[1]
+            for para in cell.paragraphs:
+                for run in para.runs:
+                    if '................' in run.text:
+                        run.text = run.text.replace('................', format_date(data['terminSkladaniaOfertData']))
+                    if '....... : .' in run.text:
+                        run.text = run.text.replace('....... : .', data.get('terminSkladaniaOfertGodzina', ''))
+        
+        # Otwarcie ofert
+        if data.get('dataOtwarciaOfert'):
+            cell = table.rows[2].cells[1]
+            for para in cell.paragraphs:
+                for run in para.runs:
+                    if '................' in run.text:
+                        run.text = run.text.replace('................', format_date(data['dataOtwarciaOfert']))
+    
+    # Tabela 8 - Udzielenie zamówienia
+    if len(doc.tables) > 8:
+        table = doc.tables[8]
+        # Wiersz 4 - Udzielenie zamówienia
+        if data.get('dataZawarciaUmowy') or data.get('wykonawcaUmowy') or data.get('kwotaUmowy'):
+            cell = table.rows[4].cells[1]
+            for para in cell.paragraphs:
+                for run in para.runs:
+                    if '............... r.' in run.text:
+                        run.text = run.text.replace('............... r.', format_date(data.get('dataZawarciaUmowy', '')) + ' r.')
+                    if '.....................................' in run.text:
+                        run.text = run.text.replace('.....................................', data.get('wykonawcaUmowy', ''))
+    
+    # Tabela 9 - Ogłoszenie o wyniku i osoba sporządzająca
+    if len(doc.tables) > 9:
+        table = doc.tables[9]
+        # Wiersz 0 - Ogłoszenie o wyniku
+        if data.get('dataOgloszeniaWyniku') or data.get('numerOgloszeniaWyniku'):
+            cell = table.rows[0].cells[1]
+            for para in cell.paragraphs:
+                for run in para.runs:
+                    if '................................ r.' in run.text:
+                        run.text = run.text.replace('................................ r.', format_date(data.get('dataOgloszeniaWyniku', '')) + ' r.')
+                    if '.................' in run.text:
+                        run.text = run.text.replace('.................', data.get('numerOgloszeniaWyniku', ''))
+        
+        # Wiersz 3 - Osoba sporządzająca
+        if data.get('osobaSPorzadzajaca'):
+            cell = table.rows[3].cells[1]
+            for para in cell.paragraphs:
+                for run in para.runs:
+                    if '......................' in run.text:
+                        run.text = run.text.replace('......................', data['osobaSPorzadzajaca'])
+        
+        # Wiersz 4 - Zatwierdzenie
+        if data.get('osobaZatwierdzajaca'):
+            cell = table.rows[4].cells[1]
+            for para in cell.paragraphs:
+                for run in para.runs:
+                    if '...........................................' in run.text:
+                        run.text = run.text.replace('...........................................', data['osobaZatwierdzajaca'])
+    
+    return doc
 
 @app.route('/api/generate-doc', methods=['POST'])
 def generate_doc():
     try:
         data = request.json
         
-        # Tworzenie dokumentu Word
-        doc = Document()
+        # Ścieżka do szablonu
+        template_path = os.path.join(os.path.dirname(__file__), 'szablon_protokol.docx')
         
-        # Styl tytułu
-        title = doc.add_heading('SPECYFIKACJA WARUNKÓW ZAMÓWIENIA (SWZ)', 0)
-        title.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        if not os.path.exists(template_path):
+            return jsonify({'error': 'Szablon nie został znaleziony'}), 404
         
-        doc.add_paragraph()
-        
-        # 1. Dane zamawiającego
-        if any([data.get('zamawiajacyNazwa'), data.get('zamawiajacyAdres'), 
-                data.get('zamawiajacyTelefon'), data.get('zamawiajacyEmail'), 
-                data.get('zamawiajacyWWW')]):
-            doc.add_heading('1. Dane zamawiającego', level=1)
-            if data.get('zamawiajacyNazwa'):
-                doc.add_paragraph(f"Nazwa: {data['zamawiajacyNazwa']}")
-            if data.get('zamawiajacyAdres'):
-                doc.add_paragraph(f"Adres: {data['zamawiajacyAdres']}")
-            if data.get('zamawiajacyTelefon'):
-                doc.add_paragraph(f"Telefon: {data['zamawiajacyTelefon']}")
-            if data.get('zamawiajacyEmail'):
-                doc.add_paragraph(f"E-mail: {data['zamawiajacyEmail']}")
-            if data.get('zamawiajacyWWW'):
-                doc.add_paragraph(f"Strona internetowa: {data['zamawiajacyWWW']}")
-        
-        # 2. Adres strony WWW dla dokumentów
-        if data.get('dokumentyWWW'):
-            doc.add_heading('2. Adres strony WWW dla dokumentów', level=1)
-            doc.add_paragraph(data['dokumentyWWW'])
-        
-        # 3. Tryb udzielenia zamówienia
-        if data.get('trybZamowienia'):
-            doc.add_heading('3. Tryb udzielenia zamówienia', level=1)
-            doc.add_paragraph(data['trybZamowienia'])
-        
-        # 4. Informacja o negocjacjach
-        if data.get('negocjacje'):
-            doc.add_heading('4. Informacja o negocjacjach', level=1)
-            doc.add_paragraph(data['negocjacje'])
-        
-        # 5. Opis przedmiotu zamówienia
-        if data.get('opisPrzedmiotu'):
-            doc.add_heading('5. Opis przedmiotu zamówienia (OPZ)', level=1)
-            doc.add_paragraph(data['opisPrzedmiotu'])
-        
-        # 6. Termin wykonania zamówienia
-        if data.get('terminWykonania'):
-            doc.add_heading('6. Termin wykonania zamówienia', level=1)
-            doc.add_paragraph(data['terminWykonania'])
-        
-        # 7. Projektowane postanowienia umowy
-        if data.get('postanowieniaUmowy'):
-            doc.add_heading('7. Projektowane postanowienia umowy', level=1)
-            doc.add_paragraph(data['postanowieniaUmowy'])
-        
-        # 8. Informacje o komunikacji elektronicznej
-        if data.get('komunikacjaElektroniczna'):
-            doc.add_heading('8. Informacje o komunikacji elektronicznej', level=1)
-            doc.add_paragraph(data['komunikacjaElektroniczna'])
-        
-        # 9. Komunikacja tradycyjna
-        if data.get('komunikacjaTradycyjna'):
-            doc.add_heading('9. Komunikacja tradycyjna', level=1)
-            doc.add_paragraph(data['komunikacjaTradycyjna'])
-        
-        # 10. Osoby do kontaktu
-        if data.get('osobyKontakt'):
-            doc.add_heading('10. Osoby do kontaktu', level=1)
-            doc.add_paragraph(data['osobyKontakt'])
-        
-        # 11. Termin związania ofertą
-        if data.get('terminZwiazania'):
-            doc.add_heading('11. Termin związania ofertą', level=1)
-            doc.add_paragraph(data['terminZwiazania'])
-        
-        # 12. Opis sposobu przygotowania oferty
-        if data.get('sposobPrzygotowania'):
-            doc.add_heading('12. Opis sposobu przygotowania oferty', level=1)
-            doc.add_paragraph(data['sposobPrzygotowania'])
-        
-        # 13. Sposób oraz termin składania ofert
-        if data.get('terminSkladania'):
-            doc.add_heading('13. Sposób oraz termin składania ofert', level=1)
-            doc.add_paragraph(data['terminSkladania'])
-        
-        # 14. Termin otwarcia ofert
-        if data.get('terminOtwarcia'):
-            doc.add_heading('14. Termin otwarcia ofert', level=1)
-            doc.add_paragraph(data['terminOtwarcia'])
-        
-        # 15. Podstawy wykluczenia
-        if data.get('podstawyWykluczenia'):
-            doc.add_heading('15. Podstawy wykluczenia', level=1)
-            doc.add_paragraph(data['podstawyWykluczenia'])
-        
-        # 16. Sposób obliczenia ceny
-        if data.get('sposobObliczeniaCeny'):
-            doc.add_heading('16. Sposób obliczenia ceny', level=1)
-            doc.add_paragraph(data['sposobObliczeniaCeny'])
-        
-        # 17. Opis kryteriów oceny ofert
-        if data.get('kryteriaOceny'):
-            doc.add_heading('17. Opis kryteriów oceny ofert', level=1)
-            doc.add_paragraph(data['kryteriaOceny'])
-        
-        # 18. Formalności po wyborze
-        if data.get('formalnosciPoWyborze'):
-            doc.add_heading('18. Formalności po wyborze', level=1)
-            doc.add_paragraph(data['formalnosciPoWyborze'])
-        
-        # 19. Pouczenie o środkach ochrony prawnej
-        if data.get('pouczenieOchronaPrawna'):
-            doc.add_heading('19. Pouczenie o środkach ochrony prawnej', level=1)
-            doc.add_paragraph(data['pouczenieOchronaPrawna'])
+        # Wypełnij szablon
+        doc = fill_template(template_path, data)
         
         # Zapisz do bufora
         file_stream = io.BytesIO()
@@ -138,10 +250,11 @@ def generate_doc():
             file_stream,
             mimetype='application/vnd.openxmlformats-officedocument.wordprocessingml.document',
             as_attachment=True,
-            download_name='SWZ_Przetarg.docx'
+            download_name='Protokol_Przetargu.docx'
         )
         
     except Exception as e:
+        print(f"Error: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
 @app.route('/api/health', methods=['GET'])
